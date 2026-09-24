@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krispy Leafs | Cannabis lifestyle &amp; clothing since 2021</title>
+<meta name="description" content="Krispy Leafs is a premium cannabis lifestyle and clothing brand built around fashion, culture, education, and community.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="gate-box">
+    <img src="assets/img/logo-donut.png" alt="Krispy Leafs logo" width="140">
+    <h2 id="gate-title">Are you 21 or older?</h2>
+    <p>Krispy Leafs content is intended for adults of legal age.</p>
+    <div class="gate-actions">
+      <button class="btn" id="gate-yes">Yes, enter</button>
+      <a class="btn ghost" href="https://www.google.com">No, leave</a>
+    </div>
+  </div>
+</div>
+
+<header class="nav" id="nav">
+  <a href="#top" class="brand">Krispy Leafs</a>
+  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+  <nav id="menu">
+    <a href="#mission">Mission</a>
+    <a href="#drops">Drops</a>
+    <a href="#learn">Learn</a>
+    <a href="#community">Community</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="blob b1"></div><div class="blob b2"></div>
+    <div class="hero-text">
+      <p class="tag">Since 2021</p>
+      <h1>Cannabis culture, <br>worn well.</h1>
+      <p class="lede">Premium clothing and lifestyle built around fashion, culture, education, and community.</p>
+      <div class="hero-cta">
+        <a class="btn" href="#drops">Shop the drop</a>
+        <a class="btn ghost" href="#mission">Our mission</a>
+      </div>
+    </div>
+    <img class="hero-logo" id="tilt" src="assets/img/logo-donut.png" alt="Krispy Leafs donut logo with a cartoon leaf on top">
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="track">
+      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
+      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
+      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
+    </div>
+  </div>
+
+  <section class="mission" id="mission">
+    <div class="mission-copy reveal">
+      <h2>Krispy Leafs is a premium cannabis lifestyle and clothing brand.</h2>
+      <p>We started in 2021 with one idea: stoner culture deserves better design, better information, and a better crowd. Everything we make and share comes back to four things.</p>
+    </div>
+    <div class="pillars">
+      <article class="pillar reveal"><h3>Fashion</h3><p>Heavyweight tees and hoodies with art you'd frame.</p></article>
+      <article class="pillar reveal"><h3>Culture</h3><p>Illustrated tributes to the cartoons, films, and characters we grew up on.</p></article>
+      <article class="pillar reveal"><h3>Education</h3><p>Plain-language guides on consumption, laws, and safety.</p></article>
+      <article class="pillar reveal"><h3>Community</h3><p>Events, collabs, and a crew that looks out for each other.</p></article>
+    </div>
+  </section>
+
+  <section class="drops" id="drops">
+    <div class="section-head">
+      <h2>Stoner Culture collection</h2>
+      <p>Scroll sideways. Every piece starts as an original illustration.</p>
+    </div>
+    <div class="rail" tabindex="0" aria-label="Collection gallery">
+      <figure class="feature"><img src="assets/img/poster.jpg" alt="Stoner Culture poster: two friends in a lowrider at sunset" loading="lazy"><figcaption>Stoner Culture: World Peace / High Life</figcaption></figure>
+      <figure><img src="assets/img/art-1.jpg" alt="Illustrated Krispy Leafs print with a caped hero and a green-haired villain on a rooftop" loading="lazy"><figcaption>Rooftop</figcaption></figure>
+      <figure><img src="assets/img/art-2.jpg" alt="Colorful cosmic Krispy Leafs print with a mad scientist and sidekick" loading="lazy"><figcaption>Space Session</figcaption></figure>
+      <figure><img src="assets/img/art-3.jpg" alt="Krispy Leafs print of a giant monster smoking a joint against a fiery sky" loading="lazy"><figcaption>Monster Smoke</figcaption></figure>
+      <figure><img src="assets/img/art-4.jpg" alt="Krispy Leafs print of cartoon characters relaxing on a hill" loading="lazy"><figcaption>Consider</figcaption></figure>
+      <figure><img src="assets/img/art-5.jpg" alt="Stoner Culture print of cartoon characters sharing a smoke session" loading="lazy"><figcaption>Circle Up</figcaption></figure>
+    </div>
+  </section>
+
+  <section class="learn" id="learn">
+    <div class="section-head">
+      <h2>Know before you go</h2>
+      <p>Straight answers, no lectures. Guides live here as we publish them.</p>
+    </div>
+    <div class="learn-grid">
+      <details class="reveal" open><summary>Start low, go slow</summary><p>Begin with a small amount, wait to feel the full effect, and only then decide whether you want more. Edibles can take two hours or longer to kick in.</p></details>
+      <details class="reveal"><summary>Know your local laws</summary><p>Cannabis rules differ by state and country, including where you can buy, possess, and consume. Check your local regulations before you travel.</p></details>
+      <details class="reveal"><summary>Consume responsibly</summary><p>Never drive after consuming, keep products locked away from kids and pets, and skip it if you're pregnant or on medication that could interact.</p></details>
+    </div>
+  </section>
+
+  <section class="community" id="community">
+    <div class="community-box reveal">
+      <h2>Join the crew</h2>
+      <p>First look at drops, event invites, and new guides. No spam.</p>
+      <form id="signup" novalidate>
+        <label class="sr" for="email">Email address</label>
+        <input id="email" type="email" placeholder="you@email.com" required>
+        <button class="btn" type="submit">Join</button>
+      </form>
+      <p class="msg" id="msg" role="status"></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <img src="assets/img/mission.jpg" alt="Krispy Leafs mission statement card" loading="lazy" class="foot-card">
+  <div>
+    <p class="brand">Krispy Leafs</p>
+    <p>Stoner Culture. Since 2021.</p>
+    <p class="fine">For adults 21+. Please consume responsibly and follow your local laws.</p>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
