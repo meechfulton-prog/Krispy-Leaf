@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Krispy Leafs Admin</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:720px;margin:1.5rem auto;padding:0 1rem;background:#f6f1e7;color:#111}
+input,button{font:inherit;padding:.65rem .8rem;margin:.2rem 0}input{border:1px solid #bbb;width:100%;background:#fff}
+button{background:#ff4a2b;color:#fff;border:0;cursor:pointer;font-weight:700}button.d{background:#111}
+.box{background:#fff;padding:1rem;margin:1rem 0}.row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;border-top:1px solid #eee;padding:.75rem 0}
+.row img{width:70px;height:88px;object-fit:cover}.row b{flex:1;min-width:120px}.row input{width:100px}.row span{display:flex;gap:.4rem;align-items:center}
+#msg{background:#dff5e6;padding:.6rem;display:none}#msg.err{background:#fde0dc}.top{display:flex;justify-content:space-between;align-items:center}
+</style></head><body>
+<div id="login" hidden>
+  <h1>Admin login</h1><p id="lmsg"></p>
+  <form class="box" id="lf">
+    <input id="u" placeholder="Username" autocomplete="username" required>
+    <input id="p" type="password" placeholder="Password" autocomplete="current-password" required>
+    <button>Log in</button>
+  </form>
+</div>
+<div id="dash" hidden>
+  <div class="top"><h1>Merchandise</h1><button class="d" id="out">Log out</button></div>
+  <p id="msg"></p>
+  <form class="box" id="af"><h3>Add item</h3>
+    <input id="n" placeholder="Item name" maxlength="80" required>
+    <input id="pr" type="number" step="0.01" min="0" placeholder="Price (USD)" required>
+    <input id="ph" type="file" accept="image/*" required>
+    <button id="ab">Upload</button>
+  </form>
+  <div class="box"><h3>Items</h3><div id="items"></div></div>
+</div>
+<script>
+const $ = s => document.querySelector(s);
+const call = (path, opts = {}) => fetch('/api/admin/' + path, { credentials: 'same-origin', ...opts });
+function say(t, err) { const m = $('#msg'); m.textContent = t; m.className = err ? 'err' : ''; m.style.display = 'block'; }
+
+async function toJpeg(file) {
+  const bmp = await createImageBitmap(file);
+  const s = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+  const c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * s); c.height = Math.round(bmp.height * s);
+  const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height);
+  x.drawImage(bmp, 0, 0, c.width, c.height);
+  return new Promise(r => c.toBlob(r, 'image/jpeg', 0.82));
+}
+function el(tag, props = {}, ...kids) {
+  const e = Object.assign(document.createElement(tag), props);
+  kids.forEach(k => e.append(k)); return e;
+}
+async function render() {
+  const items = await (await fetch('/api/products')).json();
+  const box = $('#items'); box.replaceChildren();
+  if (!items.length) box.append(el('p', { textContent: 'No items yet.' }));
+  items.forEach(p => {
+    const price = el('input', { type: 'number', step: '0.01', min: '0', value: Number(p.price).toFixed(2) });
+    const save = el('button', { textContent: 'Save', onclick: async () => {
+      const r = await call('products/' + p.id, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ price: price.value }) });
+      say(r.ok ? 'Price updated.' : 'Invalid price.', !r.ok);
+    }});
+    const del = el('button', { className: 'd', textContent: 'Delete', onclick: async () => {
+      if (!confirm('Delete this item?')) return;
+      await call('products/' + p.id, { method: 'DELETE' }); say('Item deleted.'); render();
+    }});
+    box.append(el('div', { className: 'row' }, el('img', { src: p.image, alt: '' }), el('b', { textContent: p.name }), el('span', {}, '$', price, save), del));
+  });
+}
+async function show() {
+  const ok = (await call('me')).ok;
+  $('#login').hidden = ok; $('#dash').hidden = !ok;
+  if (ok) render();
+}
+$('#lf').onsubmit = async e => {
+  e.preventDefault();
+  const r = await call('login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username: $('#u').value, password: $('#p').value }) });
+  if (r.ok) { $('#p').value = ''; show(); } else $('#lmsg').textContent = (await r.json()).error;
+};
+$('#out').onclick = async () => { await call('logout', { method: 'POST' }); show(); };
+$('#af').onsubmit = async e => {
+  e.preventDefault(); $('#ab').disabled = true;
+  try {
+    const fd = new FormData();
+    fd.append('name', $('#n').value); fd.append('price', $('#pr').value);
+    fd.append('photo', await toJpeg($('#ph').files[0]), 'photo.jpg');
+    const r = await call('products', { method: 'POST', body: fd });
+    if (r.ok) { say('Item added.'); e.target.reset(); render(); } else say((await r.json()).error, true);
+  } catch { say('Could not read that image. Try a JPEG or PNG.', true); }
+  $('#ab').disabled = false;
+};
+show();
+</script></body></html>
