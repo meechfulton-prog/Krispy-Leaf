@@ -3,125 +3,161 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Krispy Leafs | Cannabis lifestyle &amp; clothing since 2021</title>
+<title>Krispy Leafs | Stoner Culture clothing &amp; lifestyle</title>
 <meta name="description" content="Krispy Leafs is a premium cannabis lifestyle and clothing brand built around fashion, culture, education, and community.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
-<style>.credit{margin-top:1rem;font-weight:600}.credit a{color:var(--lime);text-decoration:none;border-bottom:2px solid currentColor}.credit a:hover{color:var(--bone)}</style>
+<style>
+:root{--ink:#111;--bone:#f6f1e7;--red:#ff4a2b;--green:#1f8a4c;--line:#e6e2d9}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--ink);background:#fff;line-height:1.55}
+img{max-width:100%;display:block}a{color:inherit}
+.bar{background:var(--ink);color:#fff;text-align:center;font-size:.85rem;padding:.55rem 1rem;letter-spacing:.05em}
+.top{text-align:center;padding:1.5rem 1rem .25rem}
+.top img{width:min(80vw,440px);margin:auto}
+nav{display:flex;justify-content:center;gap:1.75rem;flex-wrap:wrap;padding:.9rem 1rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:20}
+nav a{font-weight:600;text-transform:uppercase;font-size:.8rem;letter-spacing:.1em;text-decoration:none}
+nav a:hover{color:var(--red)}
+.hero{position:relative}
+.hero img{width:100%;height:min(72vh,660px);object-fit:cover;object-position:50% 30%}
+.hero div{position:absolute;inset:auto 0 0 0;padding:clamp(1.5rem,5vw,3.5rem);background:linear-gradient(transparent,rgba(0,0,0,.78));color:#fff}
+h1,h2,h3{line-height:1.05;letter-spacing:-.02em;font-weight:800}
+h1{font-size:clamp(2rem,6vw,4.2rem);max-width:14ch;margin-bottom:1rem}
+h2{font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:.5rem}
+.btn{display:inline-block;background:var(--red);color:#fff;border:0;padding:.85rem 1.7rem;font:700 .9rem inherit;font-family:inherit;text-transform:uppercase;letter-spacing:.08em;text-decoration:none;cursor:pointer;transition:background .25s,transform .25s}
+.btn:hover{background:var(--ink);transform:translateY(-2px)}
+.btn.line{background:none;border:2px solid currentColor;color:inherit}
+.wrap{max-width:1200px;margin:auto;padding:clamp(3rem,8vw,5.5rem) 1.25rem}
+.head{display:flex;justify-content:space-between;align-items:end;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.25rem 1rem}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover;background:var(--bone);transition:transform .5s}
+.card .im{overflow:hidden}.card:hover img{transform:scale(1.05)}
+.card h3{font-size:1rem;margin-top:.7rem;font-weight:600;letter-spacing:0}
+.card p{font-weight:800}
+.empty{grid-column:1/-1;background:var(--bone);padding:3rem 1.5rem;text-align:center}
+.rail{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:1rem}
+.rail figure{flex:0 0 min(72vw,300px);scroll-snap-align:start}
+.rail img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--bone)}
+figcaption{font-weight:600;padding:.5rem 0}
+.band{background:var(--bone)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,6vw,5rem)}
+.pillars{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem 1rem}
+.pillars h3{border-top:3px solid var(--ink);padding-top:.6rem;margin-bottom:.3rem}
+details{border-bottom:1px solid var(--line);padding:1rem 0}
+summary{cursor:pointer;font-weight:600;font-size:1.1rem}
+details p{margin-top:.6rem;max-width:60ch}
+.join{background:var(--ink);color:#fff;text-align:center}
+.join form{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.25rem}
+input{padding:.85rem 1rem;font:inherit;border:0;min-width:min(100%,280px)}
+footer{padding:2.5rem 1.25rem;text-align:center;font-size:.9rem;border-top:1px solid var(--line)}
+footer .credit{margin-top:.5rem;font-weight:700}
+footer .credit a{color:var(--green)}
+.fine{opacity:.6;max-width:44rem;margin:.5rem auto 0}
+.gate{position:fixed;inset:0;z-index:100;background:#fff;display:grid;place-items:center;text-align:center;padding:1.5rem}
+.gate.hide{display:none}.gate>div{display:grid;gap:1rem;justify-items:center;max-width:26rem}
+.gate img{width:220px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
-<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
-  <div class="gate-box">
-    <img src="IMG_20260924_080834.png" alt="Krispy Leafs logo" width="140">
-    <h2 id="gate-title">Are you 21 or older?</h2>
-    <p>Krispy Leafs content is intended for adults of legal age.</p>
-    <div class="gate-actions">
-      <button class="btn" id="gate-yes">Yes, enter</button>
-      <a class="btn ghost" href="https://www.google.com">No, leave</a>
-    </div>
+<div class="gate" id="gate">
+  <div>
+    <img src="Pink%20and%20Neon%20Y2K%20Typography%20Beauty%20Store%20Logo.png" alt="Krispy Leafs Stoner Culture logo">
+    <h2>Are you 21 or older?</h2>
+    <p>This site is intended for adults of legal age.</p>
+    <div><button class="btn" id="yes">Yes, enter</button> <a class="btn line" href="https://www.google.com">No, leave</a></div>
   </div>
 </div>
 
-<header class="nav" id="nav">
-  <a href="#top" class="brand">Krispy Leafs</a>
-  <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
-  <nav id="menu">
-    <a href="#mission">Mission</a>
-    <a href="#drops">Drops</a>
-    <a href="#learn">Learn</a>
-    <a href="#community">Community</a>
-  </nav>
+<div class="bar">New: the Stoner Culture collection</div>
+
+<header class="top">
+  <a href="#top"><img src="Pink%20and%20Neon%20Y2K%20Typography%20Beauty%20Store%20Logo.png" alt="Krispy Leafs Stoner Culture logo"></a>
 </header>
+<nav>
+  <a href="#shop">Shop</a><a href="#art">Art</a><a href="#mission">Mission</a><a href="#learn">Learn</a><a href="#join">Join</a>
+</nav>
 
-<main id="top">
-  <section class="hero">
-    <div class="blob b1"></div><div class="blob b2"></div>
-    <div class="hero-text">
-      <p class="tag">Since 2021</p>
-      <h1>Cannabis culture, <br>worn well.</h1>
-      <p class="lede">Premium clothing and lifestyle built around fashion, culture, education, and community.</p>
-      <div class="hero-cta">
-        <a class="btn" href="#drops">Shop the drop</a>
-        <a class="btn ghost" href="#mission">Our mission</a>
-      </div>
-    </div>
-    <img class="hero-logo" id="tilt" src="IMG_20260924_080834.png" alt="Krispy Leafs donut logo with a cartoon leaf on top">
-  </section>
+<section class="hero" id="top">
+  <img src="IMG_3640.jpeg" alt="Krispy Leafs pop-up booth with hoodies and tees on display">
+  <div>
+    <h1>Cannabis culture, worn well.</h1>
+    <a class="btn" href="#shop">Shop the drop</a>
+  </div>
+</section>
 
-  <div class="marquee" aria-hidden="true">
-    <div class="track">
-      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
-      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
-      <span>Fashion</span><span>Culture</span><span>Education</span><span>Community</span>
+<section class="wrap" id="shop">
+  <div class="head"><h2>Shop</h2><span>Since 2021</span></div>
+  <div class="grid" id="products"><div class="empty"><h3>New drop loading soon</h3><p>Check back shortly for tees, hoodies, and more.</p></div></div>
+</section>
+
+<section class="band" id="art">
+  <div class="wrap">
+    <div class="head"><h2>The art</h2><span>Scroll for more</span></div>
+    <div class="rail">
+      <figure><img src="IMG_20260924_080835.png" alt="Stoner Culture poster of two friends in a lowrider at sunset" loading="lazy"><figcaption>World Peace / High Life</figcaption></figure>
+      <figure><img src="IMG_20260924_080844.png" alt="Krispy Leafs print of a caped hero and a green-haired villain on a rooftop" loading="lazy"><figcaption>Rooftop</figcaption></figure>
+      <figure><img src="IMG_20260924_080843.png" alt="Colorful cosmic Krispy Leafs print with a mad scientist and sidekick" loading="lazy"><figcaption>Space Session</figcaption></figure>
+      <figure><img src="IMG_20260924_080839.png" alt="Krispy Leafs print of a giant monster smoking a joint" loading="lazy"><figcaption>Monster Smoke</figcaption></figure>
+      <figure><img src="IMG_20260924_080841.png" alt="Krispy Leafs print of cartoon characters relaxing on a hill" loading="lazy"><figcaption>Consider</figcaption></figure>
     </div>
   </div>
+</section>
 
-  <section class="mission" id="mission">
-    <div class="mission-copy reveal">
-      <h2>Krispy Leafs is a premium cannabis lifestyle and clothing brand.</h2>
-      <p>We started in 2021 with one idea: stoner culture deserves better design, better information, and a better crowd. Everything we make and share comes back to four things.</p>
-    </div>
-    <div class="pillars">
-      <article class="pillar reveal"><h3>Fashion</h3><p>Heavyweight tees and hoodies with art you'd frame.</p></article>
-      <article class="pillar reveal"><h3>Culture</h3><p>Illustrated tributes to the cartoons, films, and characters we grew up on.</p></article>
-      <article class="pillar reveal"><h3>Education</h3><p>Plain-language guides on consumption, laws, and safety.</p></article>
-      <article class="pillar reveal"><h3>Community</h3><p>Events, collabs, and a crew that looks out for each other.</p></article>
-    </div>
-  </section>
+<section class="wrap two" id="mission">
+  <div>
+    <h2>Krispy Leafs is a premium cannabis lifestyle and clothing brand.</h2>
+    <p>Built around fashion, culture, education, and community since 2021.</p>
+  </div>
+  <div class="pillars">
+    <div><h3>Fashion</h3><p>Heavyweight pieces with art you'd frame.</p></div>
+    <div><h3>Culture</h3><p>Illustrated tributes to what we grew up on.</p></div>
+    <div><h3>Education</h3><p>Plain-language guides on safety and laws.</p></div>
+    <div><h3>Community</h3><p>Events, collabs, and a crew that looks out for each other.</p></div>
+  </div>
+</section>
 
-  <section class="drops" id="drops">
-    <div class="section-head">
-      <h2>Stoner Culture collection</h2>
-      <p>Scroll sideways. Every piece starts as an original illustration.</p>
-    </div>
-    <div class="rail" tabindex="0" aria-label="Collection gallery">
-      <figure class="feature"><img src="IMG_20260924_080835.png" alt="Stoner Culture poster: two friends in a lowrider at sunset" loading="lazy" decoding="async" onerror="this.closest('figure').remove()"><figcaption>Stoner Culture: World Peace / High Life</figcaption></figure>
-      <figure><img src="IMG_20260924_080844.png" alt="Krispy Leafs print of a caped hero and a green-haired villain on a rooftop" loading="lazy" decoding="async" onerror="this.closest('figure').remove()"><figcaption>Rooftop</figcaption></figure>
-      <figure><img src="IMG_20260924_080843.png" alt="Colorful cosmic Krispy Leafs print with a mad scientist and his sidekick" loading="lazy" decoding="async" onerror="this.closest('figure').remove()"><figcaption>Space Session</figcaption></figure>
-      <figure><img src="IMG_20260924_080839.png" alt="Krispy Leafs print of a giant monster smoking a joint against a fiery sky" loading="lazy" decoding="async" onerror="this.closest('figure').remove()"><figcaption>Monster Smoke</figcaption></figure>
-      <figure><img src="IMG_20260924_080841.png" alt="Krispy Leafs print of cartoon characters relaxing on a hill" loading="lazy" decoding="async" onerror="this.closest('figure').remove()"><figcaption>Consider</figcaption></figure>
-    </div>
-  </section>
+<section class="wrap" id="learn">
+  <h2>Know before you go</h2>
+  <details open><summary>Start low, go slow</summary><p>Begin with a small amount and wait to feel the full effect. Edibles can take two hours or longer to kick in.</p></details>
+  <details><summary>Know your local laws</summary><p>Rules on buying, possessing, and consuming cannabis differ by state and country. Check before you travel.</p></details>
+  <details><summary>Consume responsibly</summary><p>Never drive after consuming, and keep products away from kids and pets.</p></details>
+</section>
 
-  <section class="learn" id="learn">
-    <div class="section-head">
-      <h2>Know before you go</h2>
-      <p>Straight answers, no lectures. Guides live here as we publish them.</p>
-    </div>
-    <div class="learn-grid">
-      <details class="reveal" open><summary>Start low, go slow</summary><p>Begin with a small amount, wait to feel the full effect, and only then decide whether you want more. Edibles can take two hours or longer to kick in.</p></details>
-      <details class="reveal"><summary>Know your local laws</summary><p>Cannabis rules differ by state and country, including where you can buy, possess, and consume. Check your local regulations before you travel.</p></details>
-      <details class="reveal"><summary>Consume responsibly</summary><p>Never drive after consuming, keep products locked away from kids and pets, and skip it if you're pregnant or on medication that could interact.</p></details>
-    </div>
-  </section>
-
-  <section class="community" id="community">
-    <div class="community-box reveal">
-      <h2>Join the crew</h2>
-      <p>First look at drops, event invites, and new guides. No spam.</p>
-      <form id="signup" novalidate>
-        <label class="sr" for="email">Email address</label>
-        <input id="email" type="email" placeholder="you@email.com" required>
-        <button class="btn" type="submit">Join</button>
-      </form>
-      <p class="msg" id="msg" role="status"></p>
-    </div>
-  </section>
-</main>
+<section class="wrap join" id="join" style="max-width:none">
+  <h2>Join the crew</h2><p>First look at drops and events. No spam.</p>
+  <form id="signup"><input id="email" type="email" placeholder="you@email.com" required aria-label="Email address"><button class="btn" type="submit">Join</button></form>
+  <p id="msg" role="status" style="margin-top:.75rem;min-height:1.5em"></p>
+</section>
 
 <footer>
-  <img src="IMG_20260924_143743.png" alt="Krispy Leafs mission statement card" loading="lazy" class="foot-card">
-  <div>
-    <p class="brand">Krispy Leafs</p>
-    <p>Stoner Culture. Since 2021.</p>
-    <p class="credit">Built by <a href="https://highfrequencytech.com" target="_blank" rel="noopener">High Frequency Tech</a></p>
-    <p class="fine">For adults 21+. Please consume responsibly and follow your local laws.</p>
-  </div>
+  <p><strong>Krispy Leafs</strong> · Stoner Culture · Since 2021</p>
+  <p class="credit">Built by <a href="https://highfrequencytech.com" target="_blank" rel="noopener">High Frequency Tech</a></p>
+  <p class="fine">For adults 21+. Please consume responsibly and follow your local laws.</p>
 </footer>
 
-<script src="main.js"></script>
+<script>
+const API = '';
+const $ = s => document.querySelector(s);
+const ls = { get: k => { try { return localStorage.getItem(k) } catch { return null } }, set: (k, v) => { try { localStorage.setItem(k, v) } catch {} } };
+
+if (ls.get('kl-21') === 'yes') $('#gate').classList.add('hide');
+$('#yes').onclick = () => { ls.set('kl-21', 'yes'); $('#gate').classList.add('hide'); };
+
+fetch(API + '/api/products').then(r => r.ok ? r.json() : []).then(list => {
+  if (!list.length) return;
+  $('#products').innerHTML = list.map(p => `
+    <article class="card"><div class="im"><img src="${API}${p.image}" alt="${p.name.replace(/"/g, '&quot;')}" loading="lazy"></div>
+    <h3></h3><p>$${Number(p.price).toFixed(2)}</p></article>`).join('');
+  document.querySelectorAll('#products .card h3').forEach((h, i) => h.textContent = list[i].name);
+}).catch(() => {});
+
+$('#signup').onsubmit = e => {
+  e.preventDefault();
+  $('#msg').textContent = "You're in. Welcome to the crew.";
+  e.target.reset();
+};
+</script>
 </body>
 </html>
