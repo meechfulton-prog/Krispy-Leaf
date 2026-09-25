@@ -76,7 +76,7 @@ footer .credit a{color:var(--green)}
   <a href="#top"><img src="Pink%20and%20Neon%20Y2K%20Typography%20Beauty%20Store%20Logo.png" alt="Krispy Leafs Stoner Culture logo"></a>
 </header>
 <nav>
-  <a href="#shop">Shop</a><a href="#art">Art</a><a href="#mission">Mission</a><a href="#learn">Learn</a><a href="#join">Join</a>
+  <a href="#shop">Shop</a><a href="#mission">Mission</a><a href="#join">Join</a>
 </nav>
 
 <section class="hero" id="top">
@@ -92,19 +92,6 @@ footer .credit a{color:var(--green)}
   <div class="grid" id="products"><div class="empty"><h3>New drop loading soon</h3><p>Check back shortly for tees, hoodies, and more.</p></div></div>
 </section>
 
-<section class="band" id="art">
-  <div class="wrap">
-    <div class="head"><h2>The art</h2><span>Scroll for more</span></div>
-    <div class="rail">
-      <figure><img src="IMG_20260924_080835.png" alt="Stoner Culture poster of two friends in a lowrider at sunset" loading="lazy"><figcaption>World Peace / High Life</figcaption></figure>
-      <figure><img src="IMG_20260924_080844.png" alt="Krispy Leafs print of a caped hero and a green-haired villain on a rooftop" loading="lazy"><figcaption>Rooftop</figcaption></figure>
-      <figure><img src="IMG_20260924_080843.png" alt="Colorful cosmic Krispy Leafs print with a mad scientist and sidekick" loading="lazy"><figcaption>Space Session</figcaption></figure>
-      <figure><img src="IMG_20260924_080839.png" alt="Krispy Leafs print of a giant monster smoking a joint" loading="lazy"><figcaption>Monster Smoke</figcaption></figure>
-      <figure><img src="IMG_20260924_080841.png" alt="Krispy Leafs print of cartoon characters relaxing on a hill" loading="lazy"><figcaption>Consider</figcaption></figure>
-    </div>
-  </div>
-</section>
-
 <section class="wrap two" id="mission">
   <div>
     <h2>Krispy Leafs is a premium cannabis lifestyle and clothing brand.</h2>
@@ -116,13 +103,6 @@ footer .credit a{color:var(--green)}
     <div><h3>Education</h3><p>Plain-language guides on safety and laws.</p></div>
     <div><h3>Community</h3><p>Events, collabs, and a crew that looks out for each other.</p></div>
   </div>
-</section>
-
-<section class="wrap" id="learn">
-  <h2>Know before you go</h2>
-  <details open><summary>Start low, go slow</summary><p>Begin with a small amount and wait to feel the full effect. Edibles can take two hours or longer to kick in.</p></details>
-  <details><summary>Know your local laws</summary><p>Rules on buying, possessing, and consuming cannabis differ by state and country. Check before you travel.</p></details>
-  <details><summary>Consume responsibly</summary><p>Never drive after consuming, and keep products away from kids and pets.</p></details>
 </section>
 
 <section class="wrap join" id="join" style="max-width:none">
@@ -138,6 +118,7 @@ footer .credit a{color:var(--green)}
 </footer>
 
 <script>
+// If the Python backend is hosted elsewhere (e.g. Render), put its URL here, no trailing slash.
 const API = '';
 const $ = s => document.querySelector(s);
 const ls = { get: k => { try { return localStorage.getItem(k) } catch { return null } }, set: (k, v) => { try { localStorage.setItem(k, v) } catch {} } };
