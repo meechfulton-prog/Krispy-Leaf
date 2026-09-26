@@ -33,6 +33,9 @@ h2{font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:.5rem}
 .card img{width:100%;aspect-ratio:4/5;object-fit:cover;background:var(--bone);transition:transform .5s}
 .card .im{overflow:hidden}.card:hover img{transform:scale(1.05)}
 .card h3{font-size:1rem;margin-top:.7rem;font-weight:600;letter-spacing:0}
+.card h4{font-size:1rem;margin-top:.7rem;font-weight:600;letter-spacing:0}
+.cat-block+.cat-block{margin-top:2.5rem}
+.cat-title{font-size:1.2rem;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--ink);padding-bottom:.4rem}
 .card p{font-weight:800}
 .empty{grid-column:1/-1;background:var(--bone);padding:3rem 1.5rem;text-align:center}
 .rail{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:1rem}
@@ -89,7 +92,7 @@ footer .credit a{color:var(--green)}
 
 <section class="wrap" id="shop">
   <div class="head"><h2>Shop</h2><span>Since 2021</span></div>
-  <div class="grid" id="products"><div class="empty"><h3>New drop loading soon</h3><p>Check back shortly for tees, hoodies, and more.</p></div></div>
+  <div id="products"><div class="grid"><div class="empty"><h3>New drop loading soon</h3><p>Check back shortly for tees, hoodies, and more.</p></div></div></div>
 </section>
 
 <section class="wrap two" id="mission">
@@ -128,10 +131,17 @@ $('#yes').onclick = () => { ls.set('kl-21', 'yes'); $('#gate').classList.add('hi
 
 fetch(API + '/api/products').then(r => r.ok ? r.json() : []).then(list => {
   if (!list.length) return;
-  $('#products').innerHTML = list.map(p => `
-    <article class="card"><div class="im"><img src="${API}${p.image}" alt="${p.name.replace(/"/g, '&quot;')}" loading="lazy"></div>
-    <h3></h3><p>$${Number(p.price).toFixed(2)}</p></article>`).join('');
-  document.querySelectorAll('#products .card h3').forEach((h, i) => h.textContent = list[i].name);
+  const groups = {};
+  list.forEach(p => (groups[p.category || 'Shop'] ??= []).push(p));
+  $('#products').innerHTML = Object.entries(groups).map(([cat, items]) => `
+    <div class="cat-block">
+      <h3 class="cat-title">${cat.replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</h3>
+      <div class="grid">
+        ${items.map(p => `
+          <article class="card"><div class="im"><img src="${API}${p.image}" alt="${p.name.replace(/"/g, '&quot;')}" loading="lazy"></div>
+          <h4>${p.name.replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</h4><p>$${Number(p.price).toFixed(2)}</p></article>`).join('')}
+      </div>
+    </div>`).join('');
 }).catch(() => {});
 
 $('#signup').onsubmit = e => {
