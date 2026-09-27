@@ -36,6 +36,13 @@ h2{font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:.5rem}
 .card h4{font-size:1rem;margin-top:.7rem;font-weight:600;letter-spacing:0}
 .cat-block+.cat-block{margin-top:2.5rem}
 .cat-title{font-size:1.2rem;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.06em;border-bottom:2px solid var(--ink);padding-bottom:.4rem}
+.shop-nav{display:flex;gap:.6rem;flex-wrap:wrap;margin:-.75rem 0 2rem}
+.shop-nav a{border:2px solid var(--ink);border-radius:999px;padding:.4rem 1rem;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none}
+.shop-nav a:hover{background:var(--ink);color:#fff}
+.section-block+.section-block{margin-top:3.5rem;padding-top:3rem;border-top:1px solid var(--line)}
+.section-title{font-size:clamp(1.6rem,3.5vw,2.2rem);margin-bottom:1.5rem}
+.sub-title{font-size:1rem;text-transform:uppercase;letter-spacing:.06em;opacity:.65;margin:1.75rem 0 .9rem}
+.sub-title:first-of-type{margin-top:0}
 .card p{font-weight:800}
 .empty{grid-column:1/-1;background:var(--bone);padding:3rem 1.5rem;text-align:center}
 .rail{display:flex;gap:1rem;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:1rem}
@@ -79,7 +86,7 @@ footer .credit a{color:var(--green)}
   <a href="#top"><img src="Pink%20and%20Neon%20Y2K%20Typography%20Beauty%20Store%20Logo.png" alt="Krispy Leafs Stoner Culture logo"></a>
 </header>
 <nav>
-  <a href="#shop">Shop</a><a href="#mission">Mission</a><a href="#join">Join</a>
+  <a href="#shop">Shop</a><a href="#mission">Mission</a><a href="#join">Join</a><a href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">DM to Order</a><a href="https://www.youtube.com/@krispyleafs?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a>
 </nav>
 
 <section class="hero" id="top">
@@ -87,11 +94,16 @@ footer .credit a{color:var(--green)}
   <div>
     <h1>Cannabis culture, worn well.</h1>
     <a class="btn" href="#shop">Shop the drop</a>
+    <a class="btn line" href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">DM to order</a>
+    <a class="btn line" href="https://www.youtube.com/@krispyleafs?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
   </div>
 </section>
 
 <section class="wrap" id="shop">
   <div class="head"><h2>Shop</h2><span>Since 2021</span></div>
+  <div class="shop-nav">
+    <a href="#section-mens">Men's</a><a href="#section-womens">Women's</a><a href="#section-shop">Everything</a>
+  </div>
   <div id="products"><div class="grid"><div class="empty"><h3>New drop loading soon</h3><p>Check back shortly for tees, hoodies, and more.</p></div></div></div>
 </section>
 
@@ -121,6 +133,7 @@ footer .credit a{color:var(--green)}
 </footer>
 
 <script>
+// If the Python backend is hosted elsewhere (e.g. Render), put its URL here, no trailing slash.
 const API = '';
 const $ = s => document.querySelector(s);
 const ls = { get: k => { try { return localStorage.getItem(k) } catch { return null } }, set: (k, v) => { try { localStorage.setItem(k, v) } catch {} } };
@@ -128,19 +141,43 @@ const ls = { get: k => { try { return localStorage.getItem(k) } catch { return n
 if (ls.get('kl-21') === 'yes') $('#gate').classList.add('hide');
 $('#yes').onclick = () => { ls.set('kl-21', 'yes'); $('#gate').classList.add('hide'); };
 
+const esc = s => (s || '').replace(/[<>&"]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[m]));
+
+// Sorts each item into Men's, Women's, or a general Shop section based on its category text.
+// Type a category like "Men's Tees" or "Women's Hoodies" in the admin panel to route it automatically.
+function sectionFor(cat) {
+  const c = (cat || '').toLowerCase();
+  if (/wom[ae]n/.test(c)) return "Women's";
+  if (/\bmen'?s?\b/.test(c)) return "Men's";
+  return 'Shop';
+}
+const sectionIds = { "Men's": 'section-mens', "Women's": 'section-womens', 'Shop': 'section-shop' };
+
 fetch(API + '/api/products').then(r => r.ok ? r.json() : []).then(list => {
   if (!list.length) return;
-  const groups = {};
-  list.forEach(p => (groups[p.category || 'Shop'] ??= []).push(p));
-  $('#products').innerHTML = Object.entries(groups).map(([cat, items]) => `
-    <div class="cat-block">
-      <h3 class="cat-title">${cat.replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</h3>
-      <div class="grid">
-        ${items.map(p => `
-          <article class="card"><div class="im"><img src="${API}${p.image}" alt="${p.name.replace(/"/g, '&quot;')}" loading="lazy"></div>
-          <h4>${p.name.replace(/[<>&]/g, m => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</h4><p>$${Number(p.price).toFixed(2)}</p></article>`).join('')}
-      </div>
-    </div>`).join('');
+  const sections = { "Men's": {}, "Women's": {}, 'Shop': {} };
+  list.forEach(p => {
+    const sec = sectionFor(p.category);
+    const cat = p.category || 'Shop';
+    (sections[sec][cat] ??= []).push(p);
+  });
+  const order = ["Men's", "Women's", 'Shop'];
+  $('#products').innerHTML = order.filter(sec => Object.keys(sections[sec]).length).map(sec => {
+    const cats = sections[sec];
+    const catNames = Object.keys(cats);
+    const showSubheads = !(catNames.length === 1 && catNames[0].trim().toLowerCase() === sec.toLowerCase());
+    return `
+    <div class="section-block" id="${sectionIds[sec]}">
+      <h3 class="section-title">${esc(sec)}</h3>
+      ${catNames.map(cat => `
+        ${showSubheads ? `<h4 class="sub-title">${esc(cat)}</h4>` : ''}
+        <div class="grid">
+          ${cats[cat].map(p => `
+            <article class="card"><div class="im"><img src="${API}${p.image}" alt="${esc(p.name)}" loading="lazy"></div>
+            <h4>${esc(p.name)}</h4><p>$${Number(p.price).toFixed(2)}</p></article>`).join('')}
+        </div>`).join('')}
+    </div>`;
+  }).join('');
 }).catch(() => {});
 
 $('#signup').onsubmit = e => {
