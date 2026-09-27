@@ -1,10 +1,10 @@
 // Krispy Leafs backend (Netlify Function + Netlify Blobs).
 // Set in Netlify > Site configuration > Environment variables:
-//   ADMIN_PASSWORD (required), SESSION_SECRET (required, long random text), ADMIN_USER (optional)
+//   ADMIN_USER (required), ADMIN_PASSWORD (required), SESSION_SECRET (required, long random text)
 import { getStore } from "@netlify/blobs";
 import { createHmac, timingSafeEqual, randomUUID } from "node:crypto";
 
-const { ADMIN_USER = "Krispyleafs101", ADMIN_PASSWORD, SESSION_SECRET } = process.env;
+const { ADMIN_USER, ADMIN_PASSWORD, SESSION_SECRET } = process.env;
 const data = () => getStore({ name: "data", consistency: "strong" });
 const photos = () => getStore("photos");
 
@@ -14,6 +14,7 @@ const json = (obj, status = 200, headers = {}) =>
     headers: { "content-type": "application/json", "cache-control": "no-store", ...headers },
   });
 
+// Constant-time comparison (hash both sides so lengths match)
 const safeEq = (a, b) => {
   const h = (v) => createHmac("sha256", "cmp").update(String(v)).digest();
   return timingSafeEqual(h(a), h(b));
@@ -59,7 +60,7 @@ export default async (req, context) => {
   if (method !== "GET" && !sameOrigin(req)) return json({ error: "Bad origin" }, 403);
 
   if (b === "login" && method === "POST") {
-    if (!ADMIN_PASSWORD || !SESSION_SECRET) return json({ error: "Server not configured" }, 500);
+    if (!ADMIN_USER || !ADMIN_PASSWORD || !SESSION_SECRET) return json({ error: "Server not configured" }, 500);
     const key = `fails:${context.ip || "unknown"}`;
     const recent = ((await data().get(key, { type: "json" })) || []).filter((t) => Date.now() - t < 600000);
     if (recent.length >= 5) return json({ error: "Too many attempts. Try again in 10 minutes." }, 429);
@@ -82,6 +83,7 @@ export default async (req, context) => {
     if (method === "POST") {
       const form = await req.formData();
       const name = String(form.get("name") || "").trim().slice(0, 80);
+      const category = String(form.get("category") || "").trim().slice(0, 40) || "Uncategorized";
       const price = parsePrice(form.get("price"));
       const file = form.get("photo");
       if (!name || price === null || !file || typeof file === "string" || file.size > 5_000_000)
@@ -92,7 +94,7 @@ export default async (req, context) => {
       const id = randomUUID().replace(/-/g, "").slice(0, 12);
       await photos().set(id, buf);
       const items = await list();
-      items.push({ id, name, price, image: `/api/photo/${id}` });
+      items.push({ id, name, category, price, image: `/api/photo/${id}` });
       await data().setJSON("products", items);
       return json({ ok: true, id });
     }
