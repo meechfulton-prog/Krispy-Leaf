@@ -223,15 +223,16 @@ $('#menu-close').onclick = closeMenu;
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden) closeMenu(); });
 menu.addEventListener('click', e => { if (e.target.closest('a') && !e.target.closest('[data-filter]')) closeMenu(); });
 
-// shop sections. Category text typed in the admin decides where an item lands,
-// e.g. "Men's Tees", "Women's Hoodies", "Hats", "Kids Tees", "Stickers".
+// shop sections. The Section dropdown in the admin decides where an item lands.
+// Older items without a section are sorted by their category text instead.
 const SECTIONS = [
   { key: 'mens', name: "Men's" }, { key: 'womens', name: "Women's" },
   { key: 'hats', name: 'Hats' }, { key: 'accessories', name: 'Accessories' },
   { key: 'kids', name: 'Kids' }, { key: 'more', name: 'Shop' }
 ];
-function sectionKey(cat) {
-  const c = (cat || '').toLowerCase();
+function sectionKey(p) {
+  if (SECTIONS.some(s => s.key === p.section)) return p.section;
+  const c = (p.category || '').toLowerCase();
   if (/\bkids?\b|youth|toddler/.test(c)) return 'kids';
   if (/wom[ae]n/.test(c)) return 'womens';
   if (/\bmen'?s?\b/.test(c)) return 'mens';
@@ -248,8 +249,8 @@ function render() {
   const groups = {};
   SECTIONS.forEach(s => groups[s.key] = {});
   PRODUCTS.forEach(p => {
-    const cat = p.category || 'Shop';
-    (groups[sectionKey(p.category)][cat] ??= []).push(p);
+    const cat = (p.category && p.category !== 'Uncategorized') ? p.category.trim() : '';
+    (groups[sectionKey(p)][cat] ??= []).push(p);
   });
   const visible = SECTIONS.filter(s => (FILTER === 'all' || FILTER === s.key) && Object.keys(groups[s.key]).length);
   if (!visible.length) {
@@ -261,11 +262,10 @@ function render() {
   $('#products').innerHTML = visible.map(s => {
     const cats = groups[s.key];
     const names = Object.keys(cats);
-    const subheads = !(names.length === 1 && names[0].trim().toLowerCase() === s.name.toLowerCase());
     return `<div class="section-block">
       ${showTitles ? `<h3 class="section-title">${esc(s.name)}</h3>` : ''}
       ${names.map(cat => `
-        ${subheads ? `<h4 class="sub-title">${esc(cat)}</h4>` : ''}
+        ${cat && cat.toLowerCase() !== s.name.toLowerCase() ? `<h4 class="sub-title">${esc(cat)}</h4>` : ''}
         <div class="grid">${cats[cat].map(p => `
           <article class="card"><div class="im"><img src="${API}${p.image}" alt="${esc(p.name)}" loading="lazy"></div>
           <h4>${esc(p.name)}</h4><p>$${Number(p.price).toFixed(2)}</p></article>`).join('')}
