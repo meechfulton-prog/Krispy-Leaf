@@ -38,6 +38,9 @@ const parsePrice = (x) => {
   return Number.isFinite(p) && p >= 0 && p < 100000 ? p : null;
 };
 const list = async () => (await data().get("products", { type: "json" })) || [];
+const SECTIONS = ["mens", "womens", "kids", "hats", "accessories", "more"];
+const cleanSection = (x) => (SECTIONS.includes(String(x)) ? String(x) : "more");
+const cleanCategory = (x) => String(x ?? "").trim().slice(0, 40);
 
 export default async (req, context) => {
   const parts = new URL(req.url).pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
@@ -83,7 +86,8 @@ export default async (req, context) => {
     if (method === "POST") {
       const form = await req.formData();
       const name = String(form.get("name") || "").trim().slice(0, 80);
-      const category = String(form.get("category") || "").trim().slice(0, 40) || "Uncategorized";
+      const section = cleanSection(form.get("section"));
+      const category = cleanCategory(form.get("category"));
       const price = parsePrice(form.get("price"));
       const file = form.get("photo");
       if (!name || price === null || !file || typeof file === "string" || file.size > 5_000_000)
@@ -94,15 +98,22 @@ export default async (req, context) => {
       const id = randomUUID().replace(/-/g, "").slice(0, 12);
       await photos().set(id, buf);
       const items = await list();
-      items.push({ id, name, category, price, image: `/api/photo/${id}` });
+      items.push({ id, name, section, category, price, image: `/api/photo/${id}` });
       await data().setJSON("products", items);
       return json({ ok: true, id });
     }
     if (method === "PATCH" && c) {
-      const price = parsePrice((await req.json().catch(() => ({}))).price);
-      if (price === null) return json({ error: "Invalid price." }, 400);
+      const body = await req.json().catch(() => ({}));
+      const changes = {};
+      if ("price" in body) {
+        const price = parsePrice(body.price);
+        if (price === null) return json({ error: "Invalid price." }, 400);
+        changes.price = price;
+      }
+      if ("section" in body) changes.section = cleanSection(body.section);
+      if ("category" in body) changes.category = cleanCategory(body.category);
       const items = await list();
-      items.forEach((it) => { if (it.id === c) it.price = price; });
+      items.forEach((it) => { if (it.id === c) Object.assign(it, changes); });
       await data().setJSON("products", items);
       return json({ ok: true });
     }
