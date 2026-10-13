@@ -58,6 +58,12 @@ h2{font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:.5rem}
 .card .im{overflow:hidden}.card:hover img{transform:scale(1.05)}
 .card h4{font-size:1rem;margin-top:.7rem;font-weight:600;letter-spacing:0}
 .card p{font-weight:800}
+.card .price{display:flex;gap:.5rem;align-items:baseline}
+.card .was{font-weight:600;opacity:.5;text-decoration:line-through}
+.card .now{color:var(--red)}
+.card .sizes{font-size:.78rem;opacity:.6;margin-top:.15rem;letter-spacing:.03em}
+.badge{position:absolute;top:.6rem;left:.6rem;background:var(--red);color:#fff;font:800 .72rem inherit;text-transform:uppercase;letter-spacing:.06em;padding:.3rem .55rem;z-index:1}
+.card .im{position:relative}
 .chips{display:flex;gap:.6rem;flex-wrap:wrap;margin:-.75rem 0 2rem}
 .chip{border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:999px;padding:.4rem 1rem;font:700 .8rem inherit;font-family:inherit;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
 .chip:hover,.chip.on{background:var(--ink);color:#fff}
@@ -114,13 +120,14 @@ footer .credit a{color:var(--green)}
   </div>
   <ul class="menu-list">
     <li><a href="#shop" data-filter="all">Shop All <svg class="ic"><use href="#i-arrow"/></svg></a></li>
+    <li><a href="#shop" data-filter="sale">Sale <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#shop" data-filter="mens">Mens <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#shop" data-filter="womens">Womens <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#shop" data-filter="hats">Hats <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#shop" data-filter="accessories">Accessories <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#shop" data-filter="kids">Kids <svg class="ic"><use href="#i-arrow"/></svg></a></li>
     <li><a href="#mission">Our Mission</a></li>
-    <li><a href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">Contact Us</a></li>
+    <li><a href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">DM to Order</a></li>
     <li><a href="https://www.youtube.com/@krispyleafs?sub_confirmation=1" target="_blank" rel="noopener">Subscribe</a></li>
   </ul>
   <div class="menu-foot">
@@ -132,7 +139,7 @@ footer .credit a{color:var(--green)}
   </div>
 </div>
 
-<div class="bar">New: The Stoner Culture Collection</div>
+<div class="bar">New: the Stoner Culture collection</div>
 
 <header class="top">
   <a href="#top"><img src="Pink%20and%20Neon%20Y2K%20Typography%20Beauty%20Store%20Logo.png" alt="Krispy Leafs Stoner Culture logo"></a>
@@ -141,7 +148,7 @@ footer .credit a{color:var(--green)}
 <div class="topbar">
   <button class="icon-btn" id="menu-open" aria-label="Open menu" aria-expanded="false" aria-controls="menu"><svg class="ic"><use href="#i-menu"/></svg></button>
   <a class="wordmark" href="#top">Krispy Leafs</a>
-  <a class="icon-btn" href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener" aria-label="Contact Us"><svg class="ic"><use href="#i-ig"/></svg></a>
+  <a class="icon-btn" href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener" aria-label="DM to order on Instagram"><svg class="ic"><use href="#i-ig"/></svg></a>
 </div>
 
 <section class="hero" id="top">
@@ -149,7 +156,7 @@ footer .credit a{color:var(--green)}
   <div>
     <h1>Cannabis culture, worn well.</h1>
     <a class="btn" href="#shop">Shop the drop</a>
-    <a class="btn line" href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">Contact Us</a>
+    <a class="btn line" href="https://www.instagram.com/krispyleafs/" target="_blank" rel="noopener">DM to order</a>
     <a class="btn line" href="https://www.youtube.com/@krispyleafs?sub_confirmation=1" target="_blank" rel="noopener">Subscribe on YouTube</a>
   </div>
 </section>
@@ -158,6 +165,7 @@ footer .credit a{color:var(--green)}
   <div class="head"><h2>Shop</h2><span>Since 2021</span></div>
   <div class="chips" id="chips">
     <button class="chip on" data-filter="all">All</button>
+    <button class="chip" data-filter="sale">Sale</button>
     <button class="chip" data-filter="mens">Men's</button>
     <button class="chip" data-filter="womens">Women's</button>
     <button class="chip" data-filter="hats">Hats</button>
@@ -244,8 +252,33 @@ function sectionKey(p) {
 let PRODUCTS = [];
 let FILTER = 'all';
 
+function onSale(p) { return !!p.onSale && p.salePrice != null && p.salePrice < p.price; }
+
+function cardHtml(p) {
+  const sale = onSale(p);
+  const sizes = Array.isArray(p.sizes) ? p.sizes.filter(Boolean) : [];
+  const priceHtml = sale
+    ? `<p class="price"><span class="was">$${Number(p.price).toFixed(2)}</span><span class="now">$${Number(p.salePrice).toFixed(2)}</span></p>`
+    : `<p>$${Number(p.price).toFixed(2)}</p>`;
+  return `<article class="card"><div class="im">${sale ? '<span class="badge">Sale</span>' : ''}<img src="${API}${p.image}" alt="${esc(p.name)}" loading="lazy"></div>
+    <h4>${esc(p.name)}</h4>${priceHtml}${sizes.length ? `<p class="sizes">Sizes: ${esc(sizes.join(', '))}</p>` : ''}</article>`;
+}
+
 function render() {
   if (!PRODUCTS.length) return;             // keep the "New drop loading soon" message
+
+  if (FILTER === 'sale') {
+    const items = PRODUCTS.filter(onSale);
+    if (!items.length) {
+      $('#products').innerHTML = `<div class="grid"><div class="empty"><h3>No sale items right now</h3>
+        <p>Check back soon, or <a href="${IG}" target="_blank" rel="noopener">DM us on Instagram</a> for what's coming.</p></div></div>`;
+      return;
+    }
+    $('#products').innerHTML = `<div class="section-block"><h3 class="section-title">Sale</h3>
+      <div class="grid">${items.map(cardHtml).join('')}</div></div>`;
+    return;
+  }
+
   const groups = {};
   SECTIONS.forEach(s => groups[s.key] = {});
   PRODUCTS.forEach(p => {
@@ -266,9 +299,7 @@ function render() {
       ${showTitles ? `<h3 class="section-title">${esc(s.name)}</h3>` : ''}
       ${names.map(cat => `
         ${cat && cat.toLowerCase() !== s.name.toLowerCase() ? `<h4 class="sub-title">${esc(cat)}</h4>` : ''}
-        <div class="grid">${cats[cat].map(p => `
-          <article class="card"><div class="im"><img src="${API}${p.image}" alt="${esc(p.name)}" loading="lazy"></div>
-          <h4>${esc(p.name)}</h4><p>$${Number(p.price).toFixed(2)}</p></article>`).join('')}
+        <div class="grid">${cats[cat].map(cardHtml).join('')}
         </div>`).join('')}
     </div>`;
   }).join('');
