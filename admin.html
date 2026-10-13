@@ -15,8 +15,13 @@ label{display:block;font-size:.85rem;font-weight:600;margin-top:.5rem}
 .row .fields select{width:auto;flex:1 1 130px}
 .row .fields input.type{width:auto;flex:1 1 130px}
 .row .fields input.price{width:90px}
+.row .fields input.sizes{width:auto;flex:1 1 150px}
+.row .fields input.saleprice{width:90px}
+.row .fields label.sale{display:flex;align-items:center;gap:.3rem;font-weight:600;font-size:.85rem;margin:0;width:auto}
+.row .fields label.sale input{width:auto;margin:0}
 h4{margin:1rem 0 .1rem;text-transform:uppercase;letter-spacing:.06em;font-size:.85rem}
 #msg{background:#dff5e6;padding:.6rem;display:none}#msg.err{background:#fde0dc}.top{display:flex;justify-content:space-between;align-items:center}
+.help{font-size:.78rem;color:#666;margin:.1rem 0 0}
 </style></head><body>
 <div id="login" hidden>
   <h1>Admin login</h1><p id="lmsg"></p>
@@ -43,7 +48,12 @@ h4{margin:1rem 0 .1rem;text-transform:uppercase;letter-spacing:.06em;font-size:.
     <label for="cat">Type (optional)</label>
     <input id="cat" placeholder="e.g. Tees, Hoodies, Beanies" maxlength="40" list="cats">
     <datalist id="cats"></datalist>
+    <label for="sz">Sizes (optional)</label>
+    <input id="sz" placeholder="e.g. S, M, L, XL, XXL">
+    <p class="help">Comma-separated. Leave blank if the item is one-size.</p>
     <input id="pr" type="number" step="0.01" min="0" placeholder="Price (USD)" required>
+    <label class="sale"><input id="sale" type="checkbox"> Mark as on sale</label>
+    <input id="sp" type="number" step="0.01" min="0" placeholder="Sale price (USD)" hidden>
     <input id="ph" type="file" accept="image/*" required>
     <button id="ab">Upload</button>
   </form>
@@ -70,6 +80,7 @@ function sectionOf(p) {
   return 'more';
 }
 const typeOf = p => (p.category && p.category !== 'Uncategorized') ? p.category : '';
+const sizesOf = p => Array.isArray(p.sizes) ? p.sizes.join(', ') : '';
 
 async function toJpeg(file) {               // shrink to max 1400px JPEG before upload
   const bmp = await createImageBitmap(file);
@@ -102,13 +113,23 @@ async function render() {
     list.forEach(p => {
       const sec = sectionSelect(sectionOf(p));
       const type = el('input', { className: 'type', placeholder: 'Type (optional)', value: typeOf(p), maxLength: 40 });
+      const sizes = el('input', { className: 'sizes', placeholder: 'Sizes (e.g. S, M, L)', value: sizesOf(p) });
       const price = el('input', { className: 'price', type: 'number', step: '0.01', min: '0', value: Number(p.price).toFixed(2) });
+      const saleBox = el('input', { type: 'checkbox', checked: !!p.onSale });
+      const saleLabel = el('label', { className: 'sale' }, saleBox, 'On sale');
+      const salePrice = el('input', {
+        className: 'saleprice', type: 'number', step: '0.01', min: '0', placeholder: 'Sale $',
+        value: p.salePrice != null ? Number(p.salePrice).toFixed(2) : '', hidden: !p.onSale
+      });
+      saleBox.onchange = () => { salePrice.hidden = !saleBox.checked; };
       const save = el('button', { textContent: 'Save', onclick: async () => {
+        const body = { price: price.value, section: sec.value, category: type.value, sizes: sizes.value, onSale: saleBox.checked };
+        if (saleBox.checked) body.salePrice = salePrice.value;
         const r = await call('products/' + p.id, {
           method: 'PATCH', headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ price: price.value, section: sec.value, category: type.value })
+          body: JSON.stringify(body)
         });
-        say(r.ok ? 'Saved.' : 'Could not save. Check the price.', !r.ok);
+        say(r.ok ? 'Saved.' : 'Could not save. Check the price(s).', !r.ok);
         if (r.ok) render();
       }});
       const del = el('button', { className: 'd', textContent: 'Delete', onclick: async () => {
@@ -118,7 +139,7 @@ async function render() {
       box.append(el('div', { className: 'row' },
         el('img', { src: p.image, alt: '' }),
         el('div', { className: 'name', textContent: p.name }),
-        el('div', { className: 'fields' }, sec, type, el('span', { textContent: '$' }), price, save, del)));
+        el('div', { className: 'fields' }, sec, type, sizes, el('span', { textContent: '$' }), price, saleLabel, salePrice, save, del)));
     });
   });
 }
@@ -133,15 +154,19 @@ $('#lf').onsubmit = async e => {
   if (r.ok) { $('#p').value = ''; show(); } else $('#lmsg').textContent = (await r.json()).error;
 };
 $('#out').onclick = async () => { await call('logout', { method: 'POST' }); show(); };
+$('#sale').onchange = () => { $('#sp').hidden = !$('#sale').checked; };
 $('#af').onsubmit = async e => {
   e.preventDefault(); $('#ab').disabled = true;
   try {
     const fd = new FormData();
     fd.append('name', $('#n').value); fd.append('section', $('#sec').value);
-    fd.append('category', $('#cat').value); fd.append('price', $('#pr').value);
+    fd.append('category', $('#cat').value); fd.append('sizes', $('#sz').value);
+    fd.append('price', $('#pr').value);
+    fd.append('onSale', $('#sale').checked ? 'true' : 'false');
+    if ($('#sale').checked) fd.append('salePrice', $('#sp').value);
     fd.append('photo', await toJpeg($('#ph').files[0]), 'photo.jpg');
     const r = await call('products', { method: 'POST', body: fd });
-    if (r.ok) { say('Item added.'); e.target.reset(); render(); } else say((await r.json()).error, true);
+    if (r.ok) { say('Item added.'); e.target.reset(); $('#sp').hidden = true; render(); } else say((await r.json()).error, true);
   } catch { say('Could not read that image. Try a JPEG or PNG.', true); }
   $('#ab').disabled = false;
 };
