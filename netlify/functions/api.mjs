@@ -41,6 +41,14 @@ const list = async () => (await data().get("products", { type: "json" })) || [];
 const SECTIONS = ["mens", "womens", "kids", "hats", "accessories", "more"];
 const cleanSection = (x) => (SECTIONS.includes(String(x)) ? String(x) : "more");
 const cleanCategory = (x) => String(x ?? "").trim().slice(0, 40);
+const cleanSizes = (x) =>
+  String(x ?? "")
+    .split(",")
+    .map((s) => s.trim().slice(0, 12))
+    .filter(Boolean)
+    .filter((s, i, arr) => arr.indexOf(s) === i)
+    .slice(0, 12);
+const truthy = (x) => x === true || x === "true" || x === "on" || x === "1";
 
 export default async (req, context) => {
   const parts = new URL(req.url).pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
@@ -89,6 +97,14 @@ export default async (req, context) => {
       const section = cleanSection(form.get("section"));
       const category = cleanCategory(form.get("category"));
       const price = parsePrice(form.get("price"));
+      const sizes = cleanSizes(form.get("sizes"));
+      const onSale = truthy(form.get("onSale"));
+      let salePrice = null;
+      if (onSale) {
+        salePrice = parsePrice(form.get("salePrice"));
+        if (salePrice === null || (price !== null && salePrice >= price))
+          return json({ error: "Sale price must be a valid amount lower than the regular price." }, 400);
+      }
       const file = form.get("photo");
       if (!name || price === null || !file || typeof file === "string" || file.size > 5_000_000)
         return json({ error: "Enter a name, a valid price, and a photo under 5 MB." }, 400);
@@ -98,7 +114,7 @@ export default async (req, context) => {
       const id = randomUUID().replace(/-/g, "").slice(0, 12);
       await photos().set(id, buf);
       const items = await list();
-      items.push({ id, name, section, category, price, image: `/api/photo/${id}` });
+      items.push({ id, name, section, category, price, sizes, onSale, salePrice, image: `/api/photo/${id}` });
       await data().setJSON("products", items);
       return json({ ok: true, id });
     }
@@ -112,6 +128,22 @@ export default async (req, context) => {
       }
       if ("section" in body) changes.section = cleanSection(body.section);
       if ("category" in body) changes.category = cleanCategory(body.category);
+      if ("sizes" in body) changes.sizes = cleanSizes(body.sizes);
+      if ("onSale" in body) changes.onSale = truthy(body.onSale);
+      if ("salePrice" in body || "onSale" in body) {
+        const items0 = await list();
+        const current = items0.find((it) => it.id === c);
+        const willBeOnSale = "onSale" in body ? truthy(body.onSale) : current?.onSale;
+        if (willBeOnSale) {
+          const sp = "salePrice" in body ? parsePrice(body.salePrice) : current?.salePrice;
+          const basePrice = "price" in changes ? changes.price : current?.price;
+          if (sp === null || sp === undefined || (basePrice !== undefined && sp >= basePrice))
+            return json({ error: "Sale price must be a valid amount lower than the regular price." }, 400);
+          changes.salePrice = sp;
+        } else {
+          changes.salePrice = null;
+        }
+      }
       const items = await list();
       items.forEach((it) => { if (it.id === c) Object.assign(it, changes); });
       await data().setJSON("products", items);
