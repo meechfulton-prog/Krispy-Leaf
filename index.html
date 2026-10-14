@@ -61,7 +61,10 @@ h2{font-size:clamp(1.6rem,4vw,2.6rem);margin-bottom:.5rem}
 .card .price{display:flex;gap:.5rem;align-items:baseline}
 .card .was{font-weight:600;opacity:.5;text-decoration:line-through}
 .card .now{color:var(--red)}
-.card .sizes{font-size:.78rem;opacity:.6;margin-top:.15rem;letter-spacing:.03em}
+.card .sizes{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.size-btn{border:1.5px solid var(--ink);background:#fff;color:var(--ink);border-radius:5px;padding:.25rem .55rem;font:700 .72rem inherit;font-family:inherit;letter-spacing:.02em;cursor:pointer;min-width:2.1rem;transition:background .15s,color .15s}
+.size-btn:hover{border-color:var(--red);color:var(--red)}
+.size-btn.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
 .badge{position:absolute;top:.6rem;left:.6rem;background:var(--red);color:#fff;font:800 .72rem inherit;text-transform:uppercase;letter-spacing:.06em;padding:.3rem .55rem;z-index:1}
 .card .im{position:relative}
 .chips{display:flex;gap:.6rem;flex-wrap:wrap;margin:-.75rem 0 2rem}
@@ -260,8 +263,12 @@ function cardHtml(p) {
   const priceHtml = sale
     ? `<p class="price"><span class="was">$${Number(p.price).toFixed(2)}</span><span class="now">$${Number(p.salePrice).toFixed(2)}</span></p>`
     : `<p>$${Number(p.price).toFixed(2)}</p>`;
+  const sizesHtml = sizes.length
+    ? `<div class="sizes" role="group" aria-label="Available sizes">${sizes.map(s =>
+        `<button type="button" class="size-btn" data-size="${esc(s)}" aria-pressed="false">${esc(s)}</button>`).join('')}</div>`
+    : '';
   return `<article class="card"><div class="im">${sale ? '<span class="badge">Sale</span>' : ''}<img src="${API}${p.image}" alt="${esc(p.name)}" loading="lazy"></div>
-    <h4>${esc(p.name)}</h4>${priceHtml}${sizes.length ? `<p class="sizes">Sizes: ${esc(sizes.join(', '))}</p>` : ''}</article>`;
+    <h4>${esc(p.name)}</h4>${priceHtml}${sizesHtml}</article>`;
 }
 
 function render() {
@@ -313,6 +320,14 @@ function setFilter(f) {
 
 // chips and menu links both use data-filter
 document.addEventListener('click', e => {
+  const sizeBtn = e.target.closest('.size-btn');
+  if (sizeBtn) {
+    const group = sizeBtn.closest('.sizes');
+    const wasSelected = sizeBtn.classList.contains('sel');
+    group.querySelectorAll('.size-btn').forEach(b => { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
+    if (!wasSelected) { sizeBtn.classList.add('sel'); sizeBtn.setAttribute('aria-pressed', 'true'); }
+    return;
+  }
   const t = e.target.closest('[data-filter]');
   if (!t) return;
   e.preventDefault();
